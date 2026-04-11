@@ -78,6 +78,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',   # Si Vite
 ]
 CORS_ALLOW_CREDENTIALS = True
+STATIC_URL = '/static/'
+
 
 # === AUTRES ===
 ROOT_URLCONF = 'config.urls'
