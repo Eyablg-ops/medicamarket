@@ -40,13 +40,14 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, password) => {
-    const res = await API.post('/login/', { email, password });
-    localStorage.setItem('access_token', res.data.access);
-    localStorage.setItem('refresh_token', res.data.refresh);
-    await fetchProfile();
-    return res.data;
-  };
-
+  const res = await API.post('/login/', { email, password });
+  localStorage.setItem('access_token', res.data.access);
+  localStorage.setItem('refresh_token', res.data.refresh);
+  // Récupère le profil complet
+  const profileRes = await API.get('/profile/');
+  setUser(profileRes.data);
+  return profileRes.data; // ← retourne { role, email, first_name... }
+};
   const register = async (userData) => {
     const res = await API.post('/register/', userData);
     localStorage.setItem('access_token', res.data.tokens.access);

@@ -21,24 +21,26 @@ export default function Register() {
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
-
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    try {
-      await register(formData);
-      navigate('/dashboard');
-    } catch (err) {
-      const errors = err.response?.data;
-      if (errors) {
-        // Afficher la première erreur trouvée
-        const firstError = Object.values(errors).flat()[0];
-        setError(typeof firstError === 'string' ? firstError : 'Erreur d\'inscription');
-      } else {
-        setError('Erreur serveur');
-      }
+  e.preventDefault();
+  setError('');
+  try {
+    const result = await register(formData);
+    // result.user.role vient du backend
+    const role = result?.user?.role || formData.role;
+    if (role === 'admin')         navigate('/admin/dashboard');
+    else if (role === 'clinique') navigate('/clinique/dashboard');
+    else                          navigate('/dashboard');
+  } catch (err) {
+    const errors = err.response?.data;
+    if (errors) {
+      const firstError = Object.values(errors).flat()[0];
+      setError(typeof firstError === 'string' ? firstError : "Erreur d'inscription");
+    } else {
+      setError('Erreur serveur');
     }
-  };
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8">

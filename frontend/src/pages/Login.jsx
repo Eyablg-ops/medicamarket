@@ -9,22 +9,33 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await login(email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(
-        err.response?.data?.detail || 'Email ou mot de passe incorrect'
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  setError('');
+  setLoading(true);
+  try {
+    // Un seul appel — login() retourne res.data qui contient access/refresh
+    await login(email, password);
+    // Lire le rôle depuis le user du contexte APRÈS fetchProfile
+    // On utilise une autre approche : lire le token décodé
+    const token = localStorage.getItem('access_token');
+    const { jwtDecode } = await import('jwt-decode');
+    const decoded = jwtDecode(token);
+
+    // Récupérer le profil pour avoir le rôle
+    const profileRes = await import('../api/axios').then(m => m.default.get('/profile/'));
+    const role = profileRes.data.role;
+
+    if (role === 'admin')         navigate('/admin/dashboard');
+    else if (role === 'clinique') navigate('/clinique/dashboard');
+    else                          navigate('/dashboard');
+
+  } catch (err) {
+    setError(err.response?.data?.detail || 'Email ou mot de passe incorrect');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
