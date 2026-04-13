@@ -1,5 +1,4 @@
-// src/App.jsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import HomePage          from "./pages/HomePage";
@@ -10,7 +9,16 @@ import DashboardClinique from "./pages/DashboardClinique";
 import DashboardAdmin    from "./pages/DashboardAdmin";
 import Profile           from "./pages/Profile";
 
-// Redirige vers le bon dashboard selon le rôle
+// ── Tes nouvelles pages (à créer juste après) ──
+import ShopPage          from "./pages/ShopPage";
+import CartPage          from "./pages/CartPage";
+import CheckoutPage      from "./pages/CheckoutPage";
+import OrdersPage        from "./pages/OrdersPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
+
+import ClinicProductsPage    from "./pages/ClinicProductsPage";
+import ClinicCategoriesPage  from "./pages/ClinicCategoriesPage";
+
 function RoleRedirect() {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -20,7 +28,6 @@ function RoleRedirect() {
   return <Navigate to="/dashboard" replace />;
 }
 
-// Protège une route selon le rôle exact
 function RequireRole({ children, role }) {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -29,51 +36,76 @@ function RequireRole({ children, role }) {
   return children;
 }
 
+function RequireAuth({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+}
+
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
+      <Routes>
 
-          {/* ── Page d'accueil publique ── */}
-          <Route path="/"        element={<HomePage />} />
+        {/* ── Pages publiques ── */}
+        <Route path="/"        element={<HomePage />} />
+        <Route path="/login"    element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-          {/* ── Auth ── */}
-          <Route path="/login"    element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        {/* ── Boutique (publique) ── */}
+        <Route path="/shop"    element={<ShopPage />} />
 
-          {/* ── Dashboard client ── */}
-          <Route path="/dashboard" element={
-            <RequireRole role="client">
-              <Dashboard />
-            </RequireRole>
-          } />
+        {/* ── Panier (connecté) ── */}
+        <Route path="/cart" element={
+          <RequireAuth><CartPage /></RequireAuth>
+        } />
 
-          {/* ── Dashboard clinique ── */}
-          <Route path="/clinique/dashboard" element={
-            <RequireRole role="clinique">
-              <DashboardClinique />
-            </RequireRole>
-          } />
+        {/* ── Checkout (connecté) ── */}
+        <Route path="/checkout" element={
+          <RequireAuth><CheckoutPage /></RequireAuth>
+        } />
 
-          {/* ── Dashboard admin ── */}
-          <Route path="/admin/dashboard" element={
-            <RequireRole role="admin">
-              <DashboardAdmin />
-            </RequireRole>
-          } />
+        {/* ── Historique commandes (connecté) ── */}
+        <Route path="/orders" element={
+          <RequireAuth><OrdersPage /></RequireAuth>
+        } />
 
-          {/* ── Profil — accessible à tous les rôles connectés ── */}
-          <Route path="/profile" element={<Profile />} />
+        {/* ── Dashboard client ── */}
+        <Route path="/dashboard" element={
+          <RequireRole role="client"><Dashboard /></RequireRole>
+        } />
 
-          {/* ── Redirection automatique selon rôle ── */}
-          <Route path="/me" element={<RoleRedirect />} />
+        {/* ── Dashboard clinique ── */}
+      <Route path="/clinique/dashboard" element={
+  <RequireRole role="clinique">
+    <DashboardClinique />
+  </RequireRole>
+} />
 
-          {/* ── Toute autre URL → accueil ── */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+        {/* ── Dashboard admin ── */}
+        <Route path="/admin/dashboard" element={
+          <RequireRole role="admin"><DashboardAdmin /></RequireRole>
+        } />
 
-        </Routes>
-      </BrowserRouter>
+        {/* ── Profil ── */}
+        <Route path="/profile" element={<Profile />} />
+
+        {/* ── Redirect selon rôle ── */}
+        <Route path="/me" element={<RoleRedirect />} />
+
+        {/* ── 404 → accueil ── */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/shop/:slug" element={<ProductDetailPage />} />
+
+        <Route path="/clinique/products" element={
+  <RequireRole role="clinique"><ClinicProductsPage /></RequireRole>
+} />
+<Route path="/clinique/categories" element={
+  <RequireRole role="clinique"><ClinicCategoriesPage /></RequireRole>
+} />
+
+      </Routes>
     </AuthProvider>
   );
 }

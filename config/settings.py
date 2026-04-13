@@ -15,13 +15,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Third-party
-    'rest_framework',            # API REST
-    'rest_framework_simplejwt',  # JWT auth
-    'corsheaders',               # CORS pour le frontend
-    'django_filters',            # Filtrage API
-    # Apps locales
-    'users',                     # Notre app utilisateurs
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
+    'django_filters',
+    'users',
+    'products',
+    'orders',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -41,9 +42,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'medicamarket_db',
         'USER': 'root',
-        'PASSWORD': 'root',          # mdp par défaut MAMP
+        'PASSWORD': '',          # mdp par défaut MAMP
         'HOST': '127.0.0.1',
-        'PORT': '8889',              # port MySQL de MAMP
+        'PORT': '3306',              # port MySQL de MAMP
+        'OPTIONS': {
+            'sql_mode': 'STRICT_TRANS_TABLES',  # ← ajoute cette ligne
+        },
     }
 }
 
@@ -102,3 +106,23 @@ TEMPLATES = [
         },
     },
 ]
+# === MÉDIAS (images produits) ===
+import os
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# === EMAIL MAILTRAP ===
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_PORT = 2525
+EMAIL_HOST_USER = '3d76e1afba9b10'      # ← copie depuis Mailtrap
+EMAIL_HOST_PASSWORD = '1b98cc8d7f3505'  # ← copie depuis Mailtrap
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'noreply@medicamarket.tn'
+
+# === CACHE (pour OTP) ===
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}

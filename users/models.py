@@ -28,7 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     responsible_name = models.CharField(max_length=200, blank=True,
                                         verbose_name="Nom du responsable")
     clinic_address = models.TextField(blank=True)
-
+    clinic_logo = models.ImageField(upload_to='clinic_logos/', blank=True, null=True)
     # === Champs système ===
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)   # Accès admin Django

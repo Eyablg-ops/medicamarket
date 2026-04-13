@@ -20,6 +20,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             'first_name', 'last_name', 'phone', 'role',
             # Champs clinique (optionnels)
             'clinic_name', 'tax_id', 'responsible_name', 'clinic_address',
+            'clinic_logo',  # ← NOUVEAU
             'gdpr_consent',
         ]
 
@@ -66,6 +67,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'email', 'first_name', 'last_name', 'phone', 'role',
             'clinic_name', 'tax_id', 'responsible_name', 'clinic_address',
+             'clinic_logo',  # ← NOUVEAU
             'date_joined', 'gdpr_consent', 'gdpr_consent_date',
         ]
         read_only_fields = ['id', 'email', 'role', 'date_joined',

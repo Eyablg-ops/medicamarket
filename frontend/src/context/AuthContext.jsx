@@ -49,12 +49,17 @@ export function AuthProvider({ children }) {
   return profileRes.data; // ← retourne { role, email, first_name... }
 };
   const register = async (userData) => {
-    const res = await API.post('/register/', userData);
-    localStorage.setItem('access_token', res.data.tokens.access);
-    localStorage.setItem('refresh_token', res.data.tokens.refresh);
-    setUser(res.data.user);
-    return res.data;
-  };
+  const isFormData = userData instanceof FormData;
+  const res = await API.post('/register/', userData, {
+    headers: {
+      'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
+    },
+  });
+  localStorage.setItem('access_token', res.data.tokens.access);
+  localStorage.setItem('refresh_token', res.data.tokens.refresh);
+  setUser(res.data.user);
+  return res.data;
+};
 
   const logout = () => {
     localStorage.removeItem('access_token');
