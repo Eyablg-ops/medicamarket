@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-
+import ChatbotWidget from "./components/ai/ChatbotWidget";
 import HomePage          from "./pages/HomePage";
 import Login             from "./pages/Login";
 import Register          from "./pages/Register";
@@ -42,7 +42,19 @@ function RequireAuth({ children }) {
   if (!user) return <Navigate to="/login" replace />;
   return children;
 }
+function ChatbotVisibility() {
+  const { user, loading } = useAuth();
 
+  if (loading || !user) {
+    return null;
+  }
+
+  if (user.role === "admin") {
+    return null;
+  }
+
+  return <ChatbotWidget />;
+}
 function App() {
   return (
     <AuthProvider>

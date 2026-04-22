@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,include
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,   # Login → retourne access + refresh
     TokenRefreshView,       # Refresh → nouveau access token

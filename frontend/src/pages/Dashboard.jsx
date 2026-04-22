@@ -5,7 +5,7 @@ import { getOrders } from '../api/orders';
 import { getProducts } from '../api/products';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-
+import ChatbotWidget from '../components/ai/ChatbotWidget';
 const STATUS_LABELS = {
   pending: 'En attente', paid: 'Payé',
   processing: 'En traitement', shipped: 'Expédié',
@@ -290,6 +290,7 @@ export default function Dashboard() {
 
       </main>
       <Footer />
+       <ChatbotWidget />
     </div>
   );
 }

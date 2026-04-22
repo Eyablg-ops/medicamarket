@@ -1,9 +1,11 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-in-production')
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -23,6 +25,7 @@ INSTALLED_APPS = [
     'products',
     'orders',
     'payments',
+    'ai_features',
 ]
 
 MIDDLEWARE = [
@@ -84,6 +87,18 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 STATIC_URL = '/static/'
 
+# === AI / OLLAMA ===
+AI_PROVIDER = os.environ.get('AI_PROVIDER', 'ollama')
+OLLAMA_BASE_URL = os.environ.get(
+    'OLLAMA_BASE_URL',
+    'http://localhost:11434/api',
+)
+OLLAMA_MODEL = os.environ.get('OLLAMA_MODEL', 'llama3:8b')
+AI_FALLBACK_ENABLED = os.environ.get(
+    'AI_FALLBACK_ENABLED',
+    'true',
+).lower() == 'true'
+EXPIRY_ALERT_DAYS = int(os.environ.get('EXPIRY_ALERT_DAYS', '30'))
 
 # === AUTRES ===
 ROOT_URLCONF = 'config.urls'
@@ -107,7 +122,6 @@ TEMPLATES = [
     },
 ]
 # === MÉDIAS (images produits) ===
-import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

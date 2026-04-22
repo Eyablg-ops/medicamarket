@@ -1,0 +1,132 @@
+"""Views for AI features."""
+
+from datetime import timedelta
+
+from django.conf import settings
+from django.utils import timezone
+from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from products.models import Product
+from products.serializers import ProductSerializer
+from .permissions import IsAdminOrClinique
+from .serializers import (
+    ChatRequestSerializer,
+    ProductDescriptionRequestSerializer,
+)
+from .services import AIChatService
+
+
+class ChatAPIView(APIView):
+    """Handle chatbot requests."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = ChatRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        service = AIChatService()
+        result = service.chat(
+            message=serializer.validated_data['message'],
+            history=serializer.validated_data.get('history', []),
+        )
+
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class SmartSearchSuggestionsAPIView(APIView):
+    """Return real-time product suggestions."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        query = request.query_params.get('q', '').strip()
+
+        if len(query) < 2:
+            return Response([], status=status.HTTP_200_OK)
+
+        products = Product.objects.filter(
+            is_active=True,
+            name__icontains=query,
+        ).select_related('category')[:8]
+
+        data = [
+            {
+                'id': product.id,
+                'name': product.name,
+                'slug': product.slug,
+                'category_name': product.category.name,
+                'price': product.price,
+                'reason': 'Correspondance sur le nom du produit',
+            }
+            for product in products
+        ]
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class AlertsSummaryAPIView(APIView):
+    """Return expiration and stock alerts summary."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        threshold = timezone.now().date() + timedelta(days=settings.EXPIRY_ALERT_DAYS)
+
+        products = Product.objects.all()
+        expired_products = products.filter(expiration_date__lt=timezone.now().date())
+        expiring_soon_products = products.filter(
+            expiration_date__gte=timezone.now().date(),
+            expiration_date__lte=threshold,
+        )
+        out_of_stock_products = products.filter(stock=0)
+
+        payload = {
+            'expired_count': expired_products.count(),
+            'expiring_soon_count': expiring_soon_products.count(),
+            'out_of_stock_count': out_of_stock_products.count(),
+            'expired_products': ProductSerializer(expired_products[:5], many=True).data,
+            'expiring_soon_products': ProductSerializer(expiring_soon_products[:5], many=True).data,
+            'out_of_stock_products': ProductSerializer(out_of_stock_products[:5], many=True).data,
+        }
+
+        return Response(payload, status=status.HTTP_200_OK)
+
+
+class ProductDescriptionGenerateAPIView(APIView):
+    """Generate a safe AI description for a product."""
+
+    permission_classes = [IsAuthenticated, IsAdminOrClinique]
+
+    def post(self, request, product_id: int):
+        serializer = ProductDescriptionRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        product = Product.objects.select_related('category').filter(pk=product_id).first()
+        if product is None:
+            return Response(
+                {'error': 'Produit introuvable'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        requires_prescription = getattr(product, 'requires_prescription', False)
+
+        service = AIChatService()
+        description = service.generate_product_description(
+            name=product.name,
+            category_name=product.category.name,
+            requires_prescription=requires_prescription,
+            tone=serializer.validated_data['tone'],
+        )
+
+        return Response(
+            {
+                'product_id': product.id,
+                'generated_description': description,
+                'source': 'ollama' if service.is_configured() else 'fallback',
+            },
+            status=status.HTTP_200_OK,
+        )

@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { getClinicProducts } from '../api/clinic';
 import { getOrders } from '../api/orders';
-
+import ChatbotWidget from '../components/ai/ChatbotWidget';
 export default function DashboardClinique() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -370,6 +370,7 @@ export default function DashboardClinique() {
         )}
       </div>
       <Footer />
+      <ChatbotWidget />
     </div>
   );
 }

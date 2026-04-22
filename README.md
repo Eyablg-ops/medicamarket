@@ -376,3 +376,36 @@ cd frontend && npm run dev
 ---
 
 *Partie 2 réalisée par Marye — MedicaMarket 2026*
+--- 
+ Backend setup
+
+Open a terminal in the backend root (same level as manage.py).
+
+- Activate virtual environment
+
+Windows PowerShell:
+
+.\venv\Scripts\Activate.ps1
+
+- install these manually:
+
+pip install python-dotenv requests
+2. Create .env file in backend
+
+Create a file named:
+
+.env at the same level as manage.py.
+
+Example:
+
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434/api
+OLLAMA_MODEL=llama3:8b
+AI_FALLBACK_ENABLED=true
+EXPIRY_ALERT_DAYS=30
+
+3. Run Ollama
+
+
+
+*partie 3 rélisée par Asma Letaief*
