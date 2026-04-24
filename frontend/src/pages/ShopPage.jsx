@@ -3,7 +3,8 @@ import { getProducts, getCategories } from '../api/products';
 import ProductCard from '../components/ProductCard';
 import Navbar from '../components/Navbar';  
 import Footer from '../components/Footer';
-
+import SmartSearchBar from '../components/ai/SmartSearchBar';
+import ChatbotWidget from '../components/ai/ChatbotWidget';
 export default function ShopPage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -33,13 +34,10 @@ export default function ShopPage() {
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-4 mb-8">
-        <input
-          type="text"
-          placeholder="🔍 Rechercher un produit..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="border border-gray-300 rounded-lg px-4 py-2 w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+       <SmartSearchBar
+  value={search}
+  on_change={setSearch}
+/>
         <select
           value={selectedCategory}
           onChange={e => setSelectedCategory(e.target.value)}
@@ -63,7 +61,9 @@ export default function ShopPage() {
         </div>
       )}
     </div>
-    <div className="min-h-screen flex flex-col"><Footer /> </div>
+    <div className="min-h-screen flex flex-col"><Footer /> 
+          <ChatbotWidget />
+    </div>
     </>
   );
 }

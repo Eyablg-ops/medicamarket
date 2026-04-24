@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.db import models
 from products.models import Product
 from products.serializers import ProductSerializer
 from .permissions import IsAdminOrClinique
@@ -36,7 +36,6 @@ class ChatAPIView(APIView):
 
         return Response(result, status=status.HTTP_200_OK)
 
-
 class SmartSearchSuggestionsAPIView(APIView):
     """Return real-time product suggestions."""
 
@@ -50,8 +49,11 @@ class SmartSearchSuggestionsAPIView(APIView):
 
         products = Product.objects.filter(
             is_active=True,
-            name__icontains=query,
-        ).select_related('category')[:8]
+        ).select_related('category').filter(
+            models.Q(name__icontains=query) |
+            models.Q(description__icontains=query) |
+            models.Q(category__name__icontains=query)
+        )[:8]
 
         data = [
             {
@@ -60,13 +62,30 @@ class SmartSearchSuggestionsAPIView(APIView):
                 'slug': product.slug,
                 'category_name': product.category.name,
                 'price': product.price,
-                'reason': 'Correspondance sur le nom du produit',
+                'image': product.image.url if product.image else None,
+                'is_expiring_soon': product.is_expiring_soon,
+                'is_expired': product.is_expired,
+                'reason': self._build_reason(product, query),
             }
             for product in products
         ]
 
         return Response(data, status=status.HTTP_200_OK)
 
+    def _build_reason(self, product, query: str) -> str:
+        """Build a user-friendly reason for the suggestion."""
+        lowered_query = query.lower()
+
+        if lowered_query in product.name.lower():
+            return "Correspondance sur le nom du produit"
+
+        if lowered_query in product.category.name.lower():
+            return "Correspondance sur la catégorie"
+
+        if lowered_query in product.description.lower():
+            return "Correspondance sur la description"
+
+        return "Suggestion pertinente"
 
 class AlertsSummaryAPIView(APIView):
     """Return expiration and stock alerts summary."""

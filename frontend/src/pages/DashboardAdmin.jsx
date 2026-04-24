@@ -7,7 +7,8 @@ import {
   ResponsiveContainer, BarChart, Bar,
   CartesianGrid, XAxis, YAxis, Tooltip, Legend
 } from 'recharts';
-
+import { get_alerts_summary } from '../api/ai';
+import axios from 'axios';
 const roleStyle = (role) => {
   if (role === 'admin')    return 'bg-red-100 text-red-700';
   if (role === 'clinique') return 'bg-amber-100 text-amber-700';
@@ -23,24 +24,33 @@ export default function DashboardAdmin() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [searchUser, setSearchUser] = useState('');
-
+  const [alertsSummary, setAlertsSummary] = useState(null);
   useEffect(() => { loadData(); }, []);
 
-  const loadData = async () => {
-    try {
-     const res = await API.get('/orders/admin/stats/');
-      // Note: cet endpoint est dans orders/urls.py
-      // donc l'URL complète est /api/orders/admin/stats/
-      setStats(res.data.stats);
-      setUsers(res.data.users || []);
-      setTopProducts(res.data.top_products || []);
-      setSalesData(res.data.sales_history || []);
-    } catch (e) {
-      console.error('Erreur chargement stats:', e);
-    } finally {
-      setLoading(false);
-    }
-  };
+const loadData = async () => {
+  try {
+    const token = localStorage.getItem('access_token');
+
+    const [statsRes, alertsRes] = await Promise.all([
+      API.get('../api/orders/admin/stats/'),
+      axios.get('http://localhost:8000/api/ai/alerts/summary/', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    ]);
+
+    setStats(statsRes.data.stats);
+    setUsers(statsRes.data.users || []);
+    setTopProducts(statsRes.data.top_products || []);
+    setSalesData(statsRes.data.sales_history || []);
+    setAlertsSummary(alertsRes.data);
+  } catch (e) {
+    console.error('Erreur chargement stats:', e);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const filteredUsers = users.filter(u =>
     u.email.toLowerCase().includes(searchUser.toLowerCase()) ||
@@ -116,6 +126,30 @@ export default function DashboardAdmin() {
                     </div>
                   ))}
                 </div>
+                {alertsSummary && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                  <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+                    <p className="text-sm text-red-600">Produits expirés</p>
+                    <p className="mt-2 text-3xl font-bold text-red-700">
+                      {alertsSummary.expired_count}
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-5">
+                    <p className="text-sm text-yellow-600">Expire bientôt</p>
+                    <p className="mt-2 text-3xl font-bold text-yellow-700">
+                      {alertsSummary.expiring_soon_count}
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-gray-200 bg-gray-100 p-5">
+                    <p className="text-sm text-gray-600">Rupture de stock</p>
+                    <p className="mt-2 text-3xl font-bold text-gray-700">
+                      {alertsSummary.out_of_stock_count}
+                    </p>
+                  </div>
+                </div>
+              )}
 
                 {/* Graphique */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">

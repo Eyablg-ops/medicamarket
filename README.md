@@ -406,6 +406,7 @@ EXPIRY_ALERT_DAYS=30
 
 3. Run Ollama
 
-
-
+- pour ajouter des produits automatique
+pip install requests
+python manage.py seed_products_real_images
 *partie 3 rélisée par Asma Letaief*

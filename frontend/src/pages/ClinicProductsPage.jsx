@@ -5,7 +5,7 @@ import {
   getClinicProducts, createProduct, deleteProduct,
   getClinicCategories
 } from '../api/clinic';
-
+import { generate_product_description } from '../api/ai';
 export default function ClinicProductsPage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -14,7 +14,7 @@ export default function ClinicProductsPage() {
   const [error, setError] = useState('');
   const [productImage, setProductImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-
+const [generatingDescription, setGeneratingDescription] = useState(false);
   const [productForm, setProductForm] = useState({
     name: '', slug: '', description: '', price: '',
     stock: '', category: '', expiration_date: '',
@@ -56,6 +56,42 @@ export default function ClinicProductsPage() {
     });
     setProductImage(null);
     setImagePreview(null);
+  };
+
+  const handleGenerateDescription = async () => {
+    if (!productForm.name || !productForm.category) {
+      setError('Veuillez saisir le nom du produit et choisir une catégorie avant de générer une description.');
+      return;
+    }
+
+    setGeneratingDescription(true);
+    setError('');
+
+    try {
+      const temporaryProduct = products.find(
+        (product) => product.name.toLowerCase() === productForm.name.toLowerCase()
+      );
+
+      if (!temporaryProduct) {
+        setError(
+          "La génération IA est disponible pour les produits déjà créés. Créez d'abord le produit, puis générez sa description."
+        );
+        return;
+      }
+
+      const response = await generate_product_description(temporaryProduct.id, {
+        tone: 'professional',
+      });
+
+      setProductForm((previous) => ({
+        ...previous,
+        description: response.data.generated_description,
+      }));
+    } catch (error) {
+      setError('Erreur pendant la génération IA de la description.');
+    } finally {
+      setGeneratingDescription(false);
+    }
   };
 
   const handleCreateProduct = async () => {
@@ -138,12 +174,30 @@ export default function ClinicProductsPage() {
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
-            <textarea placeholder="Description"
+           <div className="md:col-span-2">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label className="text-sm font-medium text-gray-700">
+                Description
+              </label>
+
+              <button
+                type="button"
+                onClick={handleGenerateDescription}
+                disabled={generatingDescription}
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+              >
+                {generatingDescription ? 'Génération...' : 'Générer description IA'}
+              </button>
+            </div>
+
+            <textarea
+              placeholder="Description"
               value={productForm.description}
               onChange={e => setProductForm({ ...productForm, description: e.target.value })}
-              className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 md:col-span-2"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               rows={3}
             />
+          </div>
 
             {/* Image upload */}
             <div className="md:col-span-2">
