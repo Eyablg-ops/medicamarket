@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import axiosInstance from '../api/axiosInstance';
-
+import ChatbotWidget from '../components/ai/ChatbotWidget';
 export default function CheckoutPage() {
   const { cart, refreshCart } = useCart();
   const navigate = useNavigate();
@@ -349,6 +349,7 @@ export default function CheckoutPage() {
 
       </div>
       <Footer />
+      <ChatbotWidget />
     </div>
   );
 }

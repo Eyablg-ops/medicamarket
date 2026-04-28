@@ -6,6 +6,8 @@ import {
   getClinicCategories
 } from '../api/clinic';
 import { generate_product_description } from '../api/ai';
+import ChatbotWidget from '../components/ai/ChatbotWidget';
+
 export default function ClinicProductsPage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -326,6 +328,7 @@ const [generatingDescription, setGeneratingDescription] = useState(false);
         </div>
       </div>
       <Footer />
+       <ChatbotWidget />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 """URL routes for AI features."""
 
 from django.urls import path
-
+from .views import ProductRecommendationAPIView
 from .views import (
     AlertsSummaryAPIView,
     ChatAPIView,
@@ -21,5 +21,11 @@ urlpatterns = [
         'products/<int:product_id>/generate-description/',
         ProductDescriptionGenerateAPIView.as_view(),
         name='ai-generate-product-description',
+    
     ),
+    path(
+    'recommendations/',
+    ProductRecommendationAPIView.as_view(),
+    name='ai-recommendations',
+),
 ]

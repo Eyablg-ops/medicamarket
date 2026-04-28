@@ -5,7 +5,7 @@ import { addToCart } from '../api/orders';
 import { useCart } from '../context/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-
+import ChatbotWidget from '../components/ai/ChatbotWidget';
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -180,7 +180,9 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
-      <div className="min-h-screen flex flex-col"><Footer /> </div>
+      <div className="min-h-screen flex flex-col"><Footer />
+       <ChatbotWidget />
+       </div>
     </>
   );
 }

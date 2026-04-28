@@ -6,6 +6,7 @@ import { getProducts } from '../api/products';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ChatbotWidget from '../components/ai/ChatbotWidget';
+import RecommendationSection from '../components/ai/RecommendationSection';
 const STATUS_LABELS = {
   pending: 'En attente', paid: 'Payé',
   processing: 'En traitement', shipped: 'Expédié',
@@ -191,6 +192,7 @@ export default function Dashboard() {
           )}
         </section>
 
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* ── Produits déjà achetés ── */}
@@ -227,46 +229,7 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* ── Recommandations ── */}
-          <section className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="px-6 py-5 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">✨ Recommandé pour vous</h2>
-            </div>
-            <div className="p-6 grid grid-cols-2 gap-3">
-              {recommendations.length === 0 ? (
-                <div className="col-span-2 text-center text-gray-400 py-6">
-                  <p className="mb-3">Découvrez notre boutique</p>
-                  <Link to="/shop"
-                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-emerald-700">
-                    Voir les produits
-                  </Link>
-                </div>
-              ) : (
-                recommendations.map((p, i) => (
-                  <Link key={i} to={`/shop/${p.slug}`}
-                    className="bg-gray-50 rounded-xl p-4 hover:bg-emerald-50 hover:border-emerald-200 border border-transparent transition cursor-pointer block">
-                    <div className="w-10 h-10 mb-2 bg-white rounded-lg overflow-hidden flex items-center justify-center border">
-                      {p.image ? (
-                        <img
-                          src={p.image?.startsWith('http') ? p.image : `http://localhost:8000${p.image}`}
-                          alt={p.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-xl">💊</span>
-                      )}
-                    </div>
-                    <p className="font-medium text-gray-900 text-sm leading-snug truncate">
-                      {p.name}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5">{p.category_name}</p>
-                    <p className="text-emerald-600 font-bold text-sm mt-2">{p.price} TND</p>
-                  </Link>
-                ))
-              )}
-            </div>
-          </section>
-
+       
         </div>
 
         {/* ── Actions rapides ── */}
@@ -291,6 +254,7 @@ export default function Dashboard() {
       </main>
       <Footer />
        <ChatbotWidget />
+   
     </div>
   );
 }

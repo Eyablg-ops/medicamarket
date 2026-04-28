@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { getClinicCategories, createCategory, deleteCategory } from '../api/clinic';
+import ChatbotWidget from '../components/ai/ChatbotWidget';
 
 export default function ClinicCategoriesPage() {
   const [categories, setCategories] = useState([]);
@@ -110,6 +111,7 @@ export default function ClinicCategoriesPage() {
         </div>
       </div>
       <Footer />
+      <div className="min-h-screen flex flex-col"><ChatbotWidget /></div>
     </div>
   );
 }

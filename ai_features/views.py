@@ -1,7 +1,7 @@
 """Views for AI features."""
 
 from datetime import timedelta
-
+from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import status
@@ -149,3 +149,44 @@ class ProductDescriptionGenerateAPIView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+class ProductRecommendationAPIView(APIView):
+    """Return product recommendations based on user search behavior."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        query = request.query_params.get('q', '').strip()
+
+        products = Product.objects.filter(
+            is_active=True,
+            stock__gt=0,
+        ).select_related('category')
+
+        if query:
+            products = products.filter(
+                models.Q(name__icontains=query)
+                | models.Q(description__icontains=query)
+                | models.Q(category__name__icontains=query)
+            )
+
+        products = products.order_by('-created_at')[:8]
+
+        data = [
+            {
+                'id': product.id,
+                'name': product.name,
+                'slug': product.slug,
+                'price': product.price,
+                'stock': product.stock,
+                'category_name': product.category.name,
+                'image': product.image.url if product.image else None,
+                'reason': (
+                    "Recommandé selon vos recherches"
+                    if query
+                    else "Produit disponible recommandé"
+                ),
+            }
+            for product in products
+        ]
+
+        return Response(data, status=status.HTTP_200_OK)

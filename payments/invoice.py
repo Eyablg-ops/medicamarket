@@ -62,7 +62,7 @@ def generate_invoice(order):
     # === EN-TÊTE ===
     header_data = [
         [
-            Paragraph('🏥 MedicaMarket', title_style),
+            Paragraph('MedicaMarket', title_style),
             Paragraph(f'FACTURE #{order.id:04d}', ParagraphStyle(
                 'InvNum',
                 parent=styles['Normal'],
@@ -110,9 +110,9 @@ def generate_invoice(order):
 
     client_info = f'<b>{"Clinique" if is_clinic else "Client"} :</b> '
     if is_clinic:
-        client_info += f'{user.clinic_name or user.get_full_name()}'
+        client_info += f'{user.clinic_name or f"{user.first_name} {user.last_name}".strip()}'
     else:
-        client_info += f'{user.get_full_name() or user.email}'
+        client_info += f'{f"{user.first_name} {user.last_name}".strip() or user.email}'
 
     client_data = [
         [
@@ -128,7 +128,7 @@ def generate_invoice(order):
             Paragraph(f'Ville : {order.shipping_city}', normal_style),
         ],
         [
-            Paragraph(f'Tél : {user.phone or order.shipping_phone}', normal_style),
+            Paragraph(f'Tél : {user.phone or order.shipping_phone or ""}', normal_style),
             Paragraph(f'Tél : {order.shipping_phone}', normal_style),
         ],
     ]

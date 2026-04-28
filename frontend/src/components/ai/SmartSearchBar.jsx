@@ -39,7 +39,14 @@ export default function SmartSearchBar({ value, on_change }) {
       <input
         type="text"
         value={value}
-        onChange={(event) => on_change(event.target.value)}
+        onChange={(event) => {
+  const value = event.target.value;
+  on_change(value);
+
+  if (value.trim().length >= 2) {
+    localStorage.setItem('last_search_query', value.trim());
+  }
+}}
         onFocus={() => {
           if (suggestions.length > 0) {
             set_is_open(true);

@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SmartSearchBar from '../components/ai/SmartSearchBar';
 import ChatbotWidget from '../components/ai/ChatbotWidget';
+import RecommendationSection from '../components/ai/RecommendationSection';
 export default function ShopPage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -30,7 +31,18 @@ export default function ShopPage() {
     <>
     <Navbar/>
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">🏥 Notre Boutique</h1>
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+  <div>
+    <h1 className="text-3xl font-bold text-gray-800">
+      🏥 Notre Boutique
+    </h1>
+    <p className="mt-1 text-sm text-gray-500">
+      Trouvez rapidement vos produits médicaux.
+    </p>
+  </div>
+
+  <RecommendationSection />
+</div>
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-4 mb-8">

@@ -3,7 +3,7 @@ import { getOrders } from '../api/orders';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-
+import ChatbotWidget from '../components/ai/ChatbotWidget';
 const STATUS_COLORS = {
   pending:    'bg-yellow-100 text-yellow-700',
   paid:       'bg-green-100 text-green-700',
@@ -118,7 +118,8 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
-      <div className="min-h-screen flex flex-col"><Footer /> </div>
+      <div className="min-h-screen flex flex-col"><Footer /> 
+      <ChatbotWidget /></div>
     </>
   );
 }

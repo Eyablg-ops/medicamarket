@@ -107,15 +107,22 @@ function App() {
         <Route path="/me" element={<RoleRedirect />} />
 
         {/* ── 404 → accueil ── */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-        <Route path="/shop/:slug" element={<ProductDetailPage />} />
+<Route path="/shop/:slug" element={<ProductDetailPage />} />
 
-        <Route path="/clinique/products" element={
-  <RequireRole role="clinique"><ClinicProductsPage /></RequireRole>
+<Route path="/admin/products" element={
+  <RequireRole role="admin">
+    <ClinicProductsPage />
+  </RequireRole>
 } />
-<Route path="/clinique/categories" element={
-  <RequireRole role="clinique"><ClinicCategoriesPage /></RequireRole>
+
+<Route path="/admin/categories" element={
+  <RequireRole role="admin">
+    <ClinicCategoriesPage />
+  </RequireRole>
 } />
+
+{/* ── 404 → accueil ── */}
+<Route path="*" element={<Navigate to="/" replace />} />
 
       </Routes>
     </AuthProvider>

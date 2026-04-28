@@ -14,35 +14,48 @@ export default function Navbar() {
   };
 
   const dashboardPath =
-    user?.role === 'admin'    ? '/admin/dashboard'    :
-    user?.role === 'clinique' ? '/clinique/dashboard' :
-    '/dashboard';
+    user?.role === 'admin'
+      ? '/admin/dashboard'
+      : user?.role === 'clinique'
+        ? '/clinique/dashboard'
+        : '/dashboard';
 
   return (
     <nav className="bg-emerald-700 px-8 py-4 flex items-center justify-between shadow-md">
-      
       {/* Logo */}
-      <Link to="/" className="flex items-center gap-2 text-white font-bold text-xl no-underline">
+      <Link
+        to="/"
+        className="flex items-center gap-2 text-white font-bold text-xl no-underline"
+      >
         <span className="text-2xl">🏥</span>
         <span>MedicaMarket</span>
       </Link>
 
       {/* Liens centraux */}
       <div className="hidden md:flex items-center gap-6">
-        <Link to="/" className="text-emerald-100 hover:text-white text-sm transition">
-          Accueil
-        </Link>
-        <Link to="/shop" className="text-emerald-100 hover:text-white text-sm transition">
+        {!user && (
+          <Link
+            to="/"
+            className="text-emerald-100 hover:text-white text-sm transition"
+          >
+            Accueil
+          </Link>
+        )}
+
+        <Link
+          to="/shop"
+          className="text-emerald-100 hover:text-white text-sm transition"
+        >
           🛍️ Boutique
         </Link>
       </div>
 
       {/* Actions à droite */}
       <div className="flex items-center gap-3">
-
-        {/* Badge Panier — toujours visible */}
+        {/* Badge Panier */}
         <Link to="/cart" className="relative text-white">
           <span className="text-2xl">🛒</span>
+
           {cart?.item_count > 0 && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
               {cart.item_count}
@@ -50,67 +63,78 @@ export default function Navbar() {
           )}
         </Link>
 
- {user ? (
-  <>
-    <span className="text-emerald-100 text-sm hidden md:block">
-      Bonjour, <strong className="text-white">{user.first_name}</strong>
-    </span>
+        {user ? (
+          <>
+            <span className="text-emerald-100 text-sm hidden md:block">
+              Bonjour, <strong className="text-white">{user.first_name}</strong>
+            </span>
 
-    {/* ── Liens spécifiques CLINIQUE ── */}
-    {user.role === 'clinique' && (
-      <>
-        <Link to="/clinique/dashboard"
-          className="text-white text-sm bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-500 transition font-medium">
-          🏠 Dashboard
-        </Link>
-        <Link to="/clinique/products"
-          className="text-white text-sm bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-500 transition font-medium">
-          💊 Produits
-        </Link>
-        <Link to="/clinique/categories"
-          className="text-white text-sm bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-500 transition font-medium">
-          🗂️ Catégories
-        </Link>
-      </>
-    )}
+            {/* Dashboard selon rôle */}
+            <Link
+              to={dashboardPath}
+              className="text-white text-sm bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-500 transition font-medium"
+            >
+              🏠 Dashboard
+            </Link>
 
-    {/* ── Liens autres rôles ── */}
-    {user.role !== 'clinique' && (
-      <Link to={dashboardPath}
-        className="text-white text-sm bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-500 transition font-medium">
-        🏠 Dashboard
-      </Link>
-    )}
+            {/* Liens spécifiques ADMIN */}
+            {user.role === 'admin' && (
+              <>
+                <Link
+                  to="/admin/products"
+                  className="text-white text-sm bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-500 transition font-medium"
+                >
+                  💊 Produits
+                </Link>
 
-    {user.role !== 'clinique' && (
-      <Link to="/orders"
-        className="text-white text-sm bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-500 transition font-medium">
-        📦 Commandes
-      </Link>
-    )}
+                <Link
+                  to="/admin/categories"
+                  className="text-white text-sm bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-500 transition font-medium"
+                >
+                  🗂️ Catégories
+                </Link>
+              </>
+            )}
 
-    <Link to="/profile"
-      className="text-white text-sm bg-transparent border border-emerald-400 px-4 py-2 rounded-lg hover:bg-emerald-600 transition font-medium">
-      👤 Mon profil
-    </Link>
+            {/* Commandes pour admin, clinique et client */}
+            <Link
+              to="/orders"
+              className="text-white text-sm bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-500 transition font-medium"
+            >
+              📦 Commandes
+            </Link>
 
-    <button onClick={handleLogout}
-      className="text-white text-sm bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition font-medium">
-      Déconnexion
-    </button>
-  </>
-) : (
-  <>
-    <Link to="/login"
-      className="text-white text-sm border border-emerald-400 px-4 py-2 rounded-lg hover:bg-emerald-600 transition font-medium">
-      Se connecter
-    </Link>
-    <Link to="/register"
-      className="text-white text-sm bg-emerald-500 px-4 py-2 rounded-lg hover:bg-emerald-400 transition font-medium">
-      S'inscrire
-    </Link>
-  </>
-)}
+            <Link
+              to="/profile"
+              className="text-white text-sm bg-transparent border border-emerald-400 px-4 py-2 rounded-lg hover:bg-emerald-600 transition font-medium"
+            >
+              👤 Mon profil
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="text-white text-sm bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition font-medium"
+            >
+              Déconnexion
+            </button>
+          </>
+        ) : (
+          <>
+            <Link
+              to="/login"
+              className="text-white text-sm border border-emerald-400 px-4 py-2 rounded-lg hover:bg-emerald-600 transition font-medium"
+            >
+              Se connecter
+            </Link>
+
+            <Link
+              to="/register"
+              className="text-white text-sm bg-emerald-500 px-4 py-2 rounded-lg hover:bg-emerald-400 transition font-medium"
+            >
+              S'inscrire
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );

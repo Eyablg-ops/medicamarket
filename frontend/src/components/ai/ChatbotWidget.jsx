@@ -1,21 +1,43 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { send_chat_message } from '../../api/ai';
+
+const default_messages = [
+  {
+    role: 'assistant',
+    content: 'Bonjour 👋 Je suis l’assistant MedicaMarket.',
+  },
+];
 
 export default function ChatbotWidget() {
   const [is_open, set_is_open] = useState(false);
   const [input_value, set_input_value] = useState('');
-  const [messages, set_messages] = useState([
-    {
-      role: 'assistant',
-      content: 'Bonjour 👋 Je suis l’assistant MedicaMarket.',
-    },
-  ]);
+  const [messages, set_messages] = useState(default_messages);
   const [is_loading, set_is_loading] = useState(false);
+
+  const storage_key = useMemo(() => {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const user_id = user?.id || 'guest';
+
+    return `medicamarket_chat_history_${user_id}`;
+  }, []);
+
+  useEffect(() => {
+    const saved_messages = localStorage.getItem(storage_key);
+
+    if (saved_messages) {
+      set_messages(JSON.parse(saved_messages));
+    }
+  }, [storage_key]);
+
+  useEffect(() => {
+    localStorage.setItem(storage_key, JSON.stringify(messages));
+  }, [messages, storage_key]);
 
   const handle_submit = async (event) => {
     event.preventDefault();
 
     const trimmed_value = input_value.trim();
+
     if (!trimmed_value || is_loading) {
       return;
     }
@@ -26,17 +48,16 @@ export default function ChatbotWidget() {
     };
 
     const updated_messages = [...messages, user_message];
+
     set_messages(updated_messages);
     set_input_value('');
     set_is_loading(true);
 
     try {
-      const history = updated_messages
-        .slice(-6, -1)
-        .map((message) => ({
+      const history = updated_messages.slice(-6, -1).map((message) => ({
         role: message.role,
         content: message.content,
-  }));
+      }));
 
       const response = await send_chat_message({
         message: trimmed_value,
@@ -63,6 +84,11 @@ export default function ChatbotWidget() {
     }
   };
 
+  const clear_chat = () => {
+    set_messages(default_messages);
+    localStorage.removeItem(storage_key);
+  };
+
   return (
     <>
       <button
@@ -76,7 +102,18 @@ export default function ChatbotWidget() {
       {is_open && (
         <div className="fixed bottom-24 right-6 z-50 flex h-[500px] w-[360px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
           <div className="bg-emerald-600 px-4 py-3 text-white">
-            <h3 className="font-semibold">Assistant MedicaMarket</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">Assistant MedicaMarket</h3>
+
+              <button
+                type="button"
+                onClick={clear_chat}
+                className="text-xs text-emerald-100 hover:text-white"
+              >
+                Effacer
+              </button>
+            </div>
+
             <p className="text-xs text-emerald-100">
               Recherche produit et aide rapide
             </p>
@@ -112,6 +149,7 @@ export default function ChatbotWidget() {
                 placeholder="Posez votre question..."
                 className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
               />
+
               <button
                 type="submit"
                 disabled={is_loading}
