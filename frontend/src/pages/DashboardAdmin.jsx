@@ -62,6 +62,8 @@ const loadData = async () => {
     { key: 'overview', label: '📊 Vue d\'ensemble' },
     { key: 'users',    label: '👥 Utilisateurs' },
     { key: 'products', label: '📦 Top produits' },
+    { key: 'expired', label: '🚫 Produits expirés' },
+  { key: 'expiring', label: '⚠️ Expire bientôt' },
   ];
 
   const KPI = stats ? [
@@ -273,6 +275,25 @@ const loadData = async () => {
                 )}
               </div>
             )}
+            {/* ── Produits expirés ── */}
+{activeTab === 'expired' && (
+  <ProductAlertTable
+    title="🚫 Produits expirés"
+    products={alertsSummary?.expired_products || []}
+    emptyMessage="Aucun produit expiré."
+    variant="red"
+  />
+)}
+
+{/* ── Produits proches expiration ── */}
+{activeTab === 'expiring' && (
+  <ProductAlertTable
+    title="⚠️ Produits proches de l’expiration"
+    products={alertsSummary?.expiring_soon_products || []}
+    emptyMessage="Aucun produit proche de l’expiration."
+    variant="yellow"
+  />
+)}
           </>
         )}
       </main>
@@ -329,6 +350,68 @@ function UsersTable({ users, roleStyle }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+function ProductAlertTable({ title, products, emptyMessage, variant }) {
+  const headerClass =
+    variant === 'red'
+      ? 'bg-red-50 text-red-700'
+      : 'bg-yellow-50 text-yellow-700';
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+      <div className="px-6 py-5 border-b border-gray-100">
+        <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+      </div>
+
+      {products.length === 0 ? (
+        <div className="text-center py-12 text-gray-400">
+          {emptyMessage}
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className={headerClass}>
+              <tr>
+                <th className="text-left px-6 py-3">Produit</th>
+                <th className="text-left px-6 py-3">Catégorie</th>
+                <th className="text-left px-6 py-3">Expiration</th>
+                <th className="text-right px-6 py-3">Stock</th>
+                <th className="text-right px-6 py-3">Prix</th>
+              </tr>
+            </thead>
+
+            <tbody className="divide-y divide-gray-50">
+              {products.map((product) => (
+                <tr key={product.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 font-medium text-gray-900">
+                    {product.name}
+                  </td>
+
+                  <td className="px-6 py-4 text-gray-500">
+                    {product.category_name || '—'}
+                  </td>
+
+                  <td className={`px-6 py-4 font-semibold ${
+                    variant === 'red' ? 'text-red-600' : 'text-yellow-700'
+                  }`}>
+                    {product.expiration_date}
+                  </td>
+
+                  <td className="px-6 py-4 text-right">
+                    {product.stock}
+                  </td>
+
+                  <td className="px-6 py-4 text-right font-semibold text-emerald-700">
+                    {product.price} TND
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

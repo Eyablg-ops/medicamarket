@@ -135,16 +135,6 @@ export default function DashboardClinique() {
                 </span>
               </div>
             </div>
-            <div className="flex gap-3">
-              <Link to="/clinique/products"
-                className="bg-white text-emerald-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-50 transition">
-                + Produit
-              </Link>
-              <Link to="/clinique/categories"
-                className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-500 transition border border-emerald-400">
-                Catégories
-              </Link>
-            </div>
           </div>
         </div>
 

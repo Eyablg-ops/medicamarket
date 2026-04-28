@@ -386,7 +386,7 @@ Open a terminal in the backend root (same level as manage.py).
 Windows PowerShell:
 
 .\venv\Scripts\Activate.ps1
-
+### partie Asma Letaief
 - install these manually:
 
 pip install python-dotenv requests
@@ -408,5 +408,6 @@ EXPIRY_ALERT_DAYS=30
 
 - pour ajouter des produits automatique
 pip install requests
+pip install icrawler
 python manage.py seed_products_real_images
 *partie 3 rélisée par Asma Letaief*

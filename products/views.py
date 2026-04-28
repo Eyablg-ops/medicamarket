@@ -11,15 +11,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer
 from .permissions import IsClinicOrAdmin
-
+from django.db.models import Q
+from django.utils import timezone
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
 
-
 class ProductListView(generics.ListAPIView):
-    queryset = Product.objects.filter(is_active=True)
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -27,12 +26,30 @@ class ProductListView(generics.ListAPIView):
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'created_at', 'name']
 
+    def get_queryset(self):
+        today = timezone.now().date()
+
+        return Product.objects.filter(
+            is_active=True
+        ).filter(
+            Q(expiration_date__isnull=True) |
+            Q(expiration_date__gte=today)
+        )
 
 class ProductDetailView(generics.RetrieveAPIView):
-    queryset = Product.objects.filter(is_active=True)
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
     lookup_field = 'slug'
+
+    def get_queryset(self):
+        today = timezone.now().date()
+
+        return Product.objects.filter(
+            is_active=True
+        ).filter(
+            Q(expiration_date__isnull=True) |
+            Q(expiration_date__gte=today)
+        )
 # === VUES CLINIQUE/ADMIN ===
 
 class ClinicProductListView(generics.ListAPIView):
