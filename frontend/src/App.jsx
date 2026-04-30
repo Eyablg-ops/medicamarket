@@ -16,8 +16,8 @@ import CheckoutPage      from "./pages/CheckoutPage";
 import OrdersPage        from "./pages/OrdersPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 
-import ClinicProductsPage    from "./pages/ClinicProductsPage";
-import ClinicCategoriesPage  from "./pages/ClinicCategoriesPage";
+import AdminProductsPage    from "./pages/AdminProductsPage";
+import AdminCategoriesPage   from "./pages/AdminCategoriesPage";
 
 function RoleRedirect() {
   const { user, loading } = useAuth();
@@ -111,13 +111,13 @@ function App() {
 
 <Route path="/admin/products" element={
   <RequireRole role="admin">
-    <ClinicProductsPage />
+    <AdminProductsPage />
   </RequireRole>
 } />
 
 <Route path="/admin/categories" element={
   <RequireRole role="admin">
-    <ClinicCategoriesPage />
+    <AdminCategoriesPage />
   </RequireRole>
 } />
 

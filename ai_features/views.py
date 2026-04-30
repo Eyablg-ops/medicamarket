@@ -115,37 +115,34 @@ class AlertsSummaryAPIView(APIView):
         return Response(payload, status=status.HTTP_200_OK)
 
 
-class ProductDescriptionGenerateAPIView(APIView):
-    """Generate a safe AI description for a product."""
+class ProductDescriptionFromNameAPIView(APIView):
+    """Generate product description from product name before creation."""
 
     permission_classes = [IsAuthenticated, IsAdminOrClinique]
 
-    def post(self, request, product_id: int):
-        serializer = ProductDescriptionRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    def post(self, request):
+        name = request.data.get("name", "").strip()
+        category = request.data.get("category", "").strip()
+        tone = request.data.get("tone", "professional")
 
-        product = Product.objects.select_related('category').filter(pk=product_id).first()
-        if product is None:
+        if not name:
             return Response(
-                {'error': 'Produit introuvable'},
-                status=status.HTTP_404_NOT_FOUND,
+                {"detail": "Product name is required."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-
-        requires_prescription = getattr(product, 'requires_prescription', False)
 
         service = AIChatService()
         description = service.generate_product_description(
-            name=product.name,
-            category_name=product.category.name,
-            requires_prescription=requires_prescription,
-            tone=serializer.validated_data['tone'],
+            name=name,
+            category_name=category or "Produit médical",
+            requires_prescription=False,
+            tone=tone,
         )
 
         return Response(
             {
-                'product_id': product.id,
-                'generated_description': description,
-                'source': 'ollama' if service.is_configured() else 'fallback',
+                "generated_description": description,
+                "source": "ollama" if service.is_configured() else "fallback",
             },
             status=status.HTTP_200_OK,
         )

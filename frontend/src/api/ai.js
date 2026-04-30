@@ -25,9 +25,10 @@ export const get_search_suggestions = (query) =>
 export const get_alerts_summary = () =>
   AI_API.get('/ai/alerts/summary/');
 
-export const generate_product_description = (product_id, payload) =>
-  AI_API.post(`/ai/products/${product_id}/generate-description/`, payload);
 export const get_recommendations = (query = '') =>
   AI_API.get('/ai/recommendations/', {
     params: { q: query },
   });
+
+export const generate_product_description = (data) =>
+  AI_API.post('/ai/product-description/', data);

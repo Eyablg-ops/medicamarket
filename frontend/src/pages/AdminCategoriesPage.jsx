@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { getClinicCategories, createCategory, deleteCategory } from '../api/clinic';
+import {
+  getAdminCategories,
+  createCategory,
+  deleteCategory
+} from '../api/products';
 import ChatbotWidget from '../components/ai/ChatbotWidget';
 
 export default function ClinicCategoriesPage() {
@@ -16,7 +20,7 @@ export default function ClinicCategoriesPage() {
   const loadCategories = async () => {
     setLoading(true);
     try {
-      const res = await getClinicCategories();
+      const res = await getAdminCategories();
       setCategories(res.data.results || res.data);
     } finally {
       setLoading(false);

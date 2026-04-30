@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer
-from .permissions import IsClinicOrAdmin
+from .permissions import IsClinicOrAdmin,IsAdminRole
 from django.db.models import Q
 from django.utils import timezone
 class CategoryListView(generics.ListAPIView):
@@ -62,15 +62,13 @@ class ClinicProductListView(generics.ListAPIView):
 
 
 class ClinicProductCreateView(generics.CreateAPIView):
-    """Créer un nouveau produit"""
     serializer_class = ProductSerializer
-    permission_classes = [IsClinicOrAdmin]
+    permission_classes = [IsAdminRole]
 
 
 class ClinicProductUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    """Modifier ou supprimer un produit"""
     serializer_class = ProductSerializer
-    permission_classes = [IsClinicOrAdmin]
+    permission_classes = [IsAdminRole]
     queryset = Product.objects.all()
 
 
@@ -81,15 +79,12 @@ class ClinicCategoryListView(generics.ListAPIView):
     permission_classes = [IsClinicOrAdmin]
     pagination_class = None
 
-
 class ClinicCategoryCreateView(generics.CreateAPIView):
-    """Créer une nouvelle catégorie"""
     serializer_class = CategorySerializer
-    permission_classes = [IsClinicOrAdmin]
+    permission_classes = [IsAdminRole]
 
 
 class ClinicCategoryUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    """Modifier ou supprimer une catégorie"""
     serializer_class = CategorySerializer
-    permission_classes = [IsClinicOrAdmin]
+    permission_classes = [IsAdminRole]
     queryset = Category.objects.all()

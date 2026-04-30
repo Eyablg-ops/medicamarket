@@ -3,11 +3,13 @@
 from django.urls import path
 from .views import ProductRecommendationAPIView
 from .views import (
-    AlertsSummaryAPIView,
     ChatAPIView,
-    ProductDescriptionGenerateAPIView,
     SmartSearchSuggestionsAPIView,
+    AlertsSummaryAPIView,
+    ProductDescriptionFromNameAPIView,
+    ProductRecommendationAPIView,
 )
+
 
 urlpatterns = [
     path('chat/', ChatAPIView.as_view(), name='ai-chat'),
@@ -17,15 +19,16 @@ urlpatterns = [
         name='ai-search-suggestions',
     ),
     path('alerts/summary/', AlertsSummaryAPIView.as_view(), name='ai-alerts-summary'),
-    path(
-        'products/<int:product_id>/generate-description/',
-        ProductDescriptionGenerateAPIView.as_view(),
-        name='ai-generate-product-description',
-    
-    ),
+  path(
+    "product-description/",
+    ProductDescriptionFromNameAPIView.as_view(),
+    name="product-description",
+),
     path(
     'recommendations/',
     ProductRecommendationAPIView.as_view(),
     name='ai-recommendations',
 ),
+
+
 ]

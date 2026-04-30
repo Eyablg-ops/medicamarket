@@ -161,8 +161,7 @@ const loadData = async () => {
                         Évolution des ventes
                       </p>
                       <h2 className="text-xl font-bold text-gray-900">
-                        Performance mensuelle
-                      </h2>
+Chiffre d’affaires mensuel (TND)                      </h2>
                     </div>
                     <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full font-medium">
                       Données réelles

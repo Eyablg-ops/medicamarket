@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import {
-  getClinicProducts, createProduct, deleteProduct,
-  getClinicCategories
-} from '../api/clinic';
+  getAdminProducts,
+  createProduct,
+  deleteProduct,
+  getAdminCategories
+} from '../api/products';
 import { generate_product_description } from '../api/ai';
 import ChatbotWidget from '../components/ai/ChatbotWidget';
 
@@ -31,7 +33,7 @@ const [generatingDescription, setGeneratingDescription] = useState(false);
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const res = await getClinicProducts();
+      const res = await getAdminProducts();
       setProducts(res.data.results || res.data);
     } finally {
       setLoading(false);
@@ -40,7 +42,7 @@ const [generatingDescription, setGeneratingDescription] = useState(false);
 
   const loadCategories = async () => {
     try {
-      const res = await getClinicCategories();
+      const res = await getAdminCategories();
       setCategories(res.data.results || res.data);
     } catch {}
   };
@@ -60,41 +62,36 @@ const [generatingDescription, setGeneratingDescription] = useState(false);
     setImagePreview(null);
   };
 
-  const handleGenerateDescription = async () => {
-    if (!productForm.name || !productForm.category) {
-      setError('Veuillez saisir le nom du produit et choisir une catégorie avant de générer une description.');
-      return;
-    }
+ const handleGenerateDescription = async () => {
+  if (!productForm.name) {
+    setError('Veuillez saisir le nom du produit avant de générer une description.');
+    return;
+  }
 
-    setGeneratingDescription(true);
-    setError('');
+  setGeneratingDescription(true);
+  setError('');
 
-    try {
-      const temporaryProduct = products.find(
-        (product) => product.name.toLowerCase() === productForm.name.toLowerCase()
-      );
+  try {
+    const category = categories.find(
+      (item) => String(item.id) === String(productForm.category)
+    );
 
-      if (!temporaryProduct) {
-        setError(
-          "La génération IA est disponible pour les produits déjà créés. Créez d'abord le produit, puis générez sa description."
-        );
-        return;
-      }
+    const response = await generate_product_description({
+      name: productForm.name,
+      category: category?.name || '',
+      tone: 'professional',
+    });
 
-      const response = await generate_product_description(temporaryProduct.id, {
-        tone: 'professional',
-      });
-
-      setProductForm((previous) => ({
-        ...previous,
-        description: response.data.generated_description,
-      }));
-    } catch (error) {
-      setError('Erreur pendant la génération IA de la description.');
-    } finally {
-      setGeneratingDescription(false);
-    }
-  };
+    setProductForm((previous) => ({
+      ...previous,
+      description: response.data.generated_description,
+    }));
+  } catch (error) {
+    setError('Erreur pendant la génération IA de la description.');
+  } finally {
+    setGeneratingDescription(false);
+  }
+};
 
   const handleCreateProduct = async () => {
     setError('');
