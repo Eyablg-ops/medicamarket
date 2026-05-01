@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
+import Navbar from '../components/Navbar';
 export default function Register() {
   const [formData, setFormData] = useState({
     email: '', password: '', password_confirm: '',
@@ -62,6 +62,9 @@ export default function Register() {
   };
 
   return (
+      <>
+    <Navbar />
+
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8">
       <div className="max-w-lg w-full bg-white rounded-xl shadow-lg p-8">
         <h1 className="text-2xl font-bold text-center text-emerald-700 mb-6">
@@ -212,5 +215,6 @@ export default function Register() {
         </p>
       </div>
     </div>
+    </>
   );
 }

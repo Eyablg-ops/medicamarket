@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
+import Navbar from '../components/Navbar';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,6 +38,9 @@ export default function Login() {
 };
 
   return (
+      <>
+    <Navbar />
+
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
         <h1 className="text-2xl font-bold text-center text-emerald-700 mb-6">
@@ -92,5 +95,6 @@ export default function Login() {
         </p>
       </div>
     </div>
+</>
   );
 }
