@@ -1,4 +1,4 @@
-# 🏥 MedicaMarket — Partie 2 : E-commerce
+# 🏥 MedicaMarket 
 
 > **Branche** : `dev2/ecommerce`
 > **Basée sur** : `dev1/auth-users` (Dev 1 — Eya)
